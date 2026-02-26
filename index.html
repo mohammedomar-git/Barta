@@ -3,63 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Barta Pro | Real-time Messenger</title>
+    <title>Barta Pro Max</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f0f2f5; height: 100dvh; overflow: hidden; font-family: sans-serif; }
-        .app-container { max-width: 450px; margin: 0 auto; background: white; height: 100dvh; display: flex; flex-direction: column; position: relative; }
+        body { background-color: #f0f2f5; height: 100dvh; overflow: hidden; font-family: -apple-system, sans-serif; }
+        .app-shell { max-width: 420px; margin: 0 auto; background: white; height: 100dvh; display: flex; flex-direction: column; position: relative; }
         .chat-bg { background-color: #e5ddd5; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-blend-mode: overlay; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .message-in { animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .bubble-me { background: #dcf8c6; border-radius: 12px 0 12px 12px; }
+        .bubble-them { background: #ffffff; border-radius: 0 12px 12px 12px; }
     </style>
 </head>
 <body>
 
-<div class="app-container shadow-2xl">
+<div class="app-shell shadow-2xl">
     <div id="auth-screen" class="flex flex-col items-center justify-center h-full p-8 text-center bg-white">
-        <div class="w-20 h-20 bg-green-600 rounded-3xl flex items-center justify-center text-white text-4xl mb-6 shadow-xl">
-            <i class="fas fa-paper-plane"></i>
+        <div class="w-20 h-20 bg-[#25d366] rounded-2xl flex items-center justify-center text-white text-4xl mb-6 shadow-xl">
+            <i class="fas fa-comment-dots"></i>
         </div>
-        <h1 class="text-3xl font-black text-gray-800 mb-2">BARTA PRO</h1>
-        <p class="text-gray-500 mb-10">Secure Private Messaging</p>
+        <h1 class="text-2xl font-black text-gray-800 mb-6">BARTA PRO MAX</h1>
         <button id="login-btn" class="w-full py-4 bg-gray-900 text-white rounded-2xl font-bold flex items-center justify-center gap-3 active:scale-95 transition-all shadow-lg">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-6"> Continue with Google
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-6"> Google Login
         </button>
     </div>
 
     <div id="list-screen" class="hidden flex flex-col h-full bg-white">
-        <header class="p-4 bg-green-700 text-white flex justify-between items-center shadow-lg">
-            <h2 class="text-xl font-bold">Chats</h2>
-            <div class="flex items-center gap-3">
-                <img id="my-pic" class="w-9 h-9 rounded-full border border-white/30">
-                <button id="logout-btn" class="text-xl"><i class="fas fa-sign-out-alt"></i></button>
-            </div>
+        <header class="p-4 bg-[#075e54] text-white flex justify-between items-center shadow-md">
+            <h2 class="text-xl font-bold">Barta</h2>
+            <button id="logout-btn"><i class="fas fa-power-off"></i></button>
         </header>
-        <div class="p-4 border-b">
-            <div class="relative">
-                <i class="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
-                <input type="text" id="search-box" placeholder="Search friends..." class="w-full pl-12 pr-4 py-3 bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 transition-all">
-            </div>
+        <div class="p-3">
+            <input type="text" id="search-box" placeholder="Search friends..." class="w-full px-4 py-2.5 bg-gray-100 rounded-xl outline-none text-sm">
         </div>
         <div id="users-list" class="flex-1 overflow-y-auto divide-y divide-gray-50 hide-scrollbar"></div>
     </div>
 
-    <div id="chat-screen" class="hidden fixed inset-0 z-50 bg-white flex flex-col max-w-[450px] mx-auto">
-        <header class="p-3 bg-green-700 text-white flex items-center gap-3 shadow-md">
-            <button id="back-to-list" class="p-2"><i class="fas fa-arrow-left"></i></button>
-            <img id="target-pic" class="w-10 h-10 rounded-full bg-gray-200">
+    <div id="chat-screen" class="hidden fixed inset-0 z-50 bg-white flex flex-col max-w-[420px] mx-auto">
+        <header class="p-3 bg-[#075e54] text-white flex items-center gap-3">
+            <button id="close-chat" class="p-2"><i class="fas fa-arrow-left"></i></button>
+            <img id="target-img" class="w-10 h-10 rounded-full">
             <div class="flex-1">
                 <h3 id="target-name" class="font-bold text-sm truncate">...</h3>
-                <p class="text-[10px] text-green-200">Online</p>
+                <p id="typing-ui" class="text-[10px] text-green-300 hidden italic animate-pulse">typing...</p>
             </div>
         </header>
+
+        <div id="request-ui" class="hidden p-4 bg-yellow-50 border-b border-yellow-200 text-center">
+            <p class="text-xs text-yellow-700 mb-3 font-medium text-pretty">User has sent you a message. Accept to start chatting?</p>
+            <div class="flex justify-center gap-3">
+                <button id="accept-btn" class="px-6 py-2 bg-green-600 text-white rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm">Accept</button>
+                <button id="decline-btn" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm">Decline</button>
+            </div>
+        </div>
+
         <div id="chat-flow" class="flex-1 overflow-y-auto p-4 space-y-4 chat-bg hide-scrollbar"></div>
+
         <form id="chat-form" class="p-3 bg-gray-100 flex items-center gap-2">
-            <input type="text" id="chat-input" placeholder="Type a message..." class="flex-1 py-3 px-5 rounded-full border-none outline-none shadow-sm text-sm" autocomplete="off">
-            <button type="submit" class="bg-green-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-all">
-                <i class="fas fa-paper-plane"></i>
+            <input type="text" id="chat-input" placeholder="Type a message" class="flex-1 py-2.5 px-4 rounded-full border-none outline-none shadow-sm text-sm" autocomplete="off">
+            <button type="submit" id="send-btn" class="bg-[#075e54] text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-all">
+                <i class="fas fa-paper-plane text-sm"></i>
             </button>
         </form>
     </div>
@@ -68,7 +71,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, updateDoc, collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCTYtlZE2TU8QKnu1hirUu6Y6wiJWRt0fI",
@@ -84,113 +87,143 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    let userMe = null;
-    let activeChatId = null;
-    let usersData = [];
+    let me = null, activeChatId = null, targetUid = null;
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            userMe = user;
-            await setDoc(doc(db, "users", user.uid), {
-                uid: user.uid,
-                name: user.displayName,
-                photo: user.photoURL,
-                lastSeen: serverTimestamp()
-            }, { merge: true });
-            document.getElementById('my-pic').src = user.photoURL;
-            showScreen('list-screen');
+            me = user;
+            await setDoc(doc(db, "users", user.uid), { uid: user.uid, name: user.displayName, photo: user.photoURL, lastSeen: serverTimestamp() }, { merge: true });
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('list-screen').classList.remove('hidden');
             loadUsers();
         } else {
-            showScreen('auth-screen');
+            document.getElementById('auth-screen').classList.remove('hidden');
+            document.getElementById('list-screen').classList.add('hidden');
         }
     });
-
-    function showScreen(id) {
-        document.getElementById('auth-screen').classList.add('hidden');
-        document.getElementById('list-screen').classList.add('hidden');
-        document.getElementById(id).classList.remove('hidden');
-    }
 
     document.getElementById('login-btn').onclick = () => signInWithPopup(auth, provider);
     document.getElementById('logout-btn').onclick = () => signOut(auth);
 
     function loadUsers() {
         onSnapshot(collection(db, "users"), (snap) => {
-            usersData = snap.docs.map(d => d.data()).filter(u => u.uid !== userMe.uid);
-            renderUserList(usersData);
+            const list = document.getElementById('users-list');
+            list.innerHTML = snap.docs.map(d => d.data()).filter(u => u.uid !== me.uid).map(u => `
+                <div onclick="openChat('${u.uid}', '${u.name}', '${u.photo}')" class="flex items-center gap-4 p-4 active:bg-gray-100 border-b border-gray-50">
+                    <img src="${u.photo}" class="w-12 h-12 rounded-full border">
+                    <div class="flex-1"><h4 class="font-bold text-gray-800 text-sm">${u.name}</h4><p class="text-[10px] text-gray-400">Click to chat</p></div>
+                </div>
+            `).join('');
         });
     }
 
-    function renderUserList(users) {
-        const list = document.getElementById('users-list');
-        list.innerHTML = users.map(u => `
-            <div onclick="startChat('${u.uid}', '${u.name}', '${u.photo}')" class="flex items-center gap-4 p-4 hover:bg-gray-50 cursor-pointer active:bg-gray-100 transition-all">
-                <img src="${u.photo}" class="w-14 h-14 rounded-full border shadow-sm">
-                <div class="flex-1">
-                    <h4 class="font-bold text-gray-800">${u.name}</h4>
-                    <p class="text-xs text-gray-400">Tap to start secure chat</p>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    document.getElementById('search-box').oninput = (e) => {
-        const t = e.target.value.toLowerCase();
-        renderUserList(usersData.filter(u => u.name.toLowerCase().includes(t)));
-    };
-
-    window.startChat = (targetId, name, photo) => {
-        activeChatId = userMe.uid < targetId ? `${userMe.uid}_${targetId}` : `${targetId}_${userMe.uid}`;
+    window.openChat = async (tid, name, photo) => {
+        targetUid = tid;
+        activeChatId = me.uid < tid ? `${me.uid}_${tid}` : `${tid}_${me.uid}`;
         document.getElementById('target-name').innerText = name;
-        document.getElementById('target-pic').src = photo;
+        document.getElementById('target-img').src = photo;
         document.getElementById('chat-screen').classList.remove('hidden');
         
-        const q = query(collection(db, `chats/${activeChatId}/messages`), orderBy("time", "asc"));
+        // Check chat status
+        const chatRef = doc(db, "chats", activeChatId);
+        const chatSnap = await getDoc(chatRef);
+        
+        handleChatStatus(chatSnap.exists() ? chatSnap.data() : null);
+        
+        // Listeners
+        listenMessages();
+        listenTyping();
+    };
+
+    function handleChatStatus(data) {
+        const reqUI = document.getElementById('request-ui');
+        const form = document.getElementById('chat-form');
+        
+        if (!data) {
+            reqUI.classList.add('hidden');
+            form.classList.remove('hidden');
+        } else if (data.status === 'pending' && data.requestedBy !== me.uid) {
+            reqUI.classList.remove('hidden');
+            form.classList.add('hidden');
+        } else if (data.status === 'pending' && data.requestedBy === me.uid) {
+            reqUI.classList.add('hidden');
+            form.innerHTML = `<p class="w-full text-center text-xs text-gray-500 py-2">Waiting for approval...</p>`;
+        } else {
+            reqUI.classList.add('hidden');
+            form.classList.remove('hidden');
+        }
+    }
+
+    document.getElementById('accept-btn').onclick = async () => {
+        await updateDoc(doc(db, "chats", activeChatId), { status: 'accepted' });
+        location.reload(); // Quick refresh to reset form
+    };
+
+    function listenMessages() {
+        const q = query(collection(db, `chats/${activeChatId}/messages`), orderBy("ts", "asc"));
         onSnapshot(q, (snap) => {
             const flow = document.getElementById('chat-flow');
             flow.innerHTML = '';
             snap.forEach(d => {
                 const m = d.data();
-                const isMe = m.sid === userMe.uid;
+                const isMe = m.sid === me.uid;
                 const div = document.createElement('div');
-                div.className = `flex ${isMe ? 'justify-end' : 'justify-start'} message-in`;
+                div.className = `flex ${isMe ? 'justify-end' : 'justify-start'}`;
                 div.innerHTML = `
-                    <div class="${isMe ? 'bg-green-600 text-white rounded-l-xl rounded-tr-xl' : 'bg-white text-gray-800 rounded-r-xl rounded-tl-xl'} p-3 shadow-md max-w-[85%] relative">
-                        <p class="text-sm pb-3">${m.txt}</p>
-                        <span class="absolute bottom-1 right-2 text-[9px] opacity-70">${m.stamp || ''}</span>
+                    <div class="${isMe ? 'bubble-me' : 'bubble-them'} p-2 px-3 shadow-sm max-w-[85%] text-sm relative mb-1">
+                        ${m.txt}
+                        <div class="flex items-center justify-end gap-1 mt-1">
+                            <span class="text-[8px] opacity-50">${m.time || ''}</span>
+                            ${isMe ? `<i class="fas fa-check-double text-[8px] ${m.read ? 'text-blue-500' : 'text-gray-400'}"></i>` : ''}
+                        </div>
                     </div>
                 `;
+                if (!isMe && !m.read) updateDoc(doc(db, `chats/${activeChatId}/messages`, d.id), { read: true });
                 flow.appendChild(div);
             });
             flow.scrollTop = flow.scrollHeight;
         });
+    }
+
+    // Typing Logic
+    const input = document.getElementById('chat-input');
+    input.oninput = () => {
+        setDoc(doc(db, "chats", activeChatId), { [`typing_${me.uid}`]: true }, { merge: true });
+        clearTimeout(window.typeTimer);
+        window.typeTimer = setTimeout(() => {
+            setDoc(doc(db, "chats", activeChatId), { [`typing_${me.uid}`]: false }, { merge: true });
+        }, 2000);
     };
 
-    document.getElementById('back-to-list').onclick = () => document.getElementById('chat-screen').classList.add('hidden');
+    function listenTyping() {
+        onSnapshot(doc(db, "chats", activeChatId), (doc) => {
+            const data = doc.data();
+            const isTyping = data && data[`typing_${targetUid}`];
+            document.getElementById('typing-ui').classList.toggle('hidden', !isTyping);
+        });
+    }
 
     document.getElementById('chat-form').onsubmit = async (e) => {
         e.preventDefault();
-        const input = document.getElementById('chat-input');
-        const text = input.value.trim();
-        if(!text || !activeChatId) return;
-
+        const txt = input.value.trim();
+        if (!txt) return;
         input.value = '';
-        const now = new Date();
-        const timeString = now.getHours().toString().padStart(2, '0') + ":" + 
-                           now.getMinutes().toString().padStart(2, '0') + ":" + 
-                           now.getSeconds().toString().padStart(2, '0');
 
-        try {
-            await addDoc(collection(db, `chats/${activeChatId}/messages`), {
-                txt: text,
-                sid: userMe.uid,
-                time: serverTimestamp(),
-                stamp: timeString // এই লাইনটি সেকেন্ডসহ সময় দেখাবে
-            });
-        } catch (err) {
-            alert("Error: " + err.message);
+        const chatRef = doc(db, "chats", activeChatId);
+        const chatSnap = await getDoc(chatRef);
+
+        if (!chatSnap.exists()) {
+            await setDoc(chatRef, { status: 'pending', requestedBy: me.uid });
         }
+
+        const now = new Date();
+        await addDoc(collection(db, `chats/${activeChatId}/messages`), {
+            txt, sid: me.uid, ts: serverTimestamp(), read: false,
+            time: now.getHours() + ":" + now.getMinutes().toString().padStart(2, '0')
+        });
     };
+
+    document.getElementById('close-chat').onclick = () => document.getElementById('chat-screen').classList.add('hidden');
 </script>
 </body>
 </html>
