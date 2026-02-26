@@ -3,68 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Barta | Professional Messaging</title>
+    <title>Barta Pro | Real-time Messenger</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { --whatsapp-green: #075e54; --whatsapp-light: #25d366; }
-        body { background-color: #f0f2f5; height: 100dvh; overflow: hidden; }
-        .app-shell { max-width: 450px; margin: 0 auto; background: white; height: 100dvh; display: flex; flex-direction: column; position: relative; }
-        .messages-area { background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-blend-mode: overlay; background-color: #e5ddd5; }
+        body { background-color: #f0f2f5; height: 100dvh; overflow: hidden; font-family: sans-serif; }
+        .app-container { max-width: 450px; margin: 0 auto; background: white; height: 100dvh; display: flex; flex-direction: column; position: relative; }
+        .chat-bg { background-color: #e5ddd5; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-blend-mode: overlay; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .message-in { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-<div class="app-shell shadow-2xl">
+<div class="app-container shadow-2xl">
     <div id="auth-screen" class="flex flex-col items-center justify-center h-full p-8 text-center bg-white">
-        <div class="w-20 h-20 bg-[#25d366] rounded-2xl flex items-center justify-center text-white text-4xl mb-6 shadow-xl rotate-3">
-            <i class="fas fa-comment-alt"></i>
+        <div class="w-20 h-20 bg-green-600 rounded-3xl flex items-center justify-center text-white text-4xl mb-6 shadow-xl">
+            <i class="fas fa-paper-plane"></i>
         </div>
-        <h1 class="text-3xl font-black text-gray-800 mb-2">BARTA</h1>
-        <p class="text-gray-500 mb-10 font-medium">Professional 1-to-1 Messenger</p>
-        <button id="login-btn" class="w-full py-4 bg-gray-900 text-white rounded-2xl font-bold flex items-center justify-center gap-3 active:scale-95 transition-transform shadow-lg">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-6"> 
-            Continue with Google
+        <h1 class="text-3xl font-black text-gray-800 mb-2">BARTA PRO</h1>
+        <p class="text-gray-500 mb-10">Secure Private Messaging</p>
+        <button id="login-btn" class="w-full py-4 bg-gray-900 text-white rounded-2xl font-bold flex items-center justify-center gap-3 active:scale-95 transition-all shadow-lg">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-6"> Continue with Google
         </button>
     </div>
 
     <div id="list-screen" class="hidden flex flex-col h-full bg-white">
-        <header class="p-4 bg-[#075e54] text-white flex justify-between items-center shadow-md">
-            <h2 class="text-xl font-bold italic">Barta</h2>
-            <div class="flex items-center gap-4">
-                <img id="my-avatar" class="w-8 h-8 rounded-full border border-white/20">
-                <button id="logout-btn"><i class="fas fa-ellipsis-v"></i></button>
+        <header class="p-4 bg-green-700 text-white flex justify-between items-center shadow-lg">
+            <h2 class="text-xl font-bold">Chats</h2>
+            <div class="flex items-center gap-3">
+                <img id="my-pic" class="w-9 h-9 rounded-full border border-white/30">
+                <button id="logout-btn" class="text-xl"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </header>
-
         <div class="p-4 border-b">
-            <div class="relative group">
-                <i class="fas fa-search absolute left-4 top-3.5 text-gray-400 group-focus-within:text-[#075e54]"></i>
-                <input type="text" id="search-input" placeholder="Search people..." class="w-full pl-12 pr-4 py-3 bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#25d366] transition-all">
+            <div class="relative">
+                <i class="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
+                <input type="text" id="search-box" placeholder="Search friends..." class="w-full pl-12 pr-4 py-3 bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 transition-all">
             </div>
         </div>
-
-        <div id="users-list" class="flex-1 overflow-y-auto divide-y divide-gray-50 hide-scrollbar">
-            </div>
+        <div id="users-list" class="flex-1 overflow-y-auto divide-y divide-gray-50 hide-scrollbar"></div>
     </div>
 
     <div id="chat-screen" class="hidden fixed inset-0 z-50 bg-white flex flex-col max-w-[450px] mx-auto">
-        <header class="p-3 bg-[#075e54] text-white flex items-center gap-3">
-            <button id="close-chat" class="p-2"><i class="fas fa-arrow-left"></i></button>
-            <img id="chat-target-img" class="w-10 h-10 rounded-full bg-gray-200">
+        <header class="p-3 bg-green-700 text-white flex items-center gap-3 shadow-md">
+            <button id="back-to-list" class="p-2"><i class="fas fa-arrow-left"></i></button>
+            <img id="target-pic" class="w-10 h-10 rounded-full bg-gray-200">
             <div class="flex-1">
-                <h3 id="chat-target-name" class="font-bold text-sm">...</h3>
-                <p class="text-[10px] text-green-300">Active now</p>
+                <h3 id="target-name" class="font-bold text-sm truncate">...</h3>
+                <p class="text-[10px] text-green-200">Online</p>
             </div>
         </header>
-
-        <div id="msg-flow" class="flex-1 overflow-y-auto p-4 space-y-3 messages-area hide-scrollbar">
-            </div>
-
-        <form id="send-form" class="p-3 bg-[#f0f2f5] flex items-center gap-2">
-            <input type="text" id="msg-input" placeholder="Type a message" class="flex-1 py-3 px-5 rounded-full border-none focus:ring-1 focus:ring-green-500 outline-none shadow-sm text-sm">
-            <button type="submit" class="bg-[#075e54] text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform">
+        <div id="chat-flow" class="flex-1 overflow-y-auto p-4 space-y-4 chat-bg hide-scrollbar"></div>
+        <form id="chat-form" class="p-3 bg-gray-100 flex items-center gap-2">
+            <input type="text" id="chat-input" placeholder="Type a message..." class="flex-1 py-3 px-5 rounded-full border-none outline-none shadow-sm text-sm" autocomplete="off">
+            <button type="submit" class="bg-green-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-all">
                 <i class="fas fa-paper-plane"></i>
             </button>
         </form>
@@ -74,7 +68,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCTYtlZE2TU8QKnu1hirUu6Y6wiJWRt0fI",
@@ -90,89 +84,80 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    let me = null;
+    let userMe = null;
     let activeChatId = null;
-    let allUsers = [];
+    let usersData = [];
 
-    // --- Auth Sync ---
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            me = user;
+            userMe = user;
             await setDoc(doc(db, "users", user.uid), {
                 uid: user.uid,
                 name: user.displayName,
                 photo: user.photoURL,
-                email: user.email,
                 lastSeen: serverTimestamp()
             }, { merge: true });
-
-            document.getElementById('my-avatar').src = user.photoURL;
-            toggleScreen('list-screen');
-            initUserObserver();
+            document.getElementById('my-pic').src = user.photoURL;
+            showScreen('list-screen');
+            loadUsers();
         } else {
-            toggleScreen('auth-screen');
+            showScreen('auth-screen');
         }
     });
 
-    // --- UI Logic ---
-    function toggleScreen(id) {
-        ['auth-screen', 'list-screen'].forEach(s => document.getElementById(s).classList.add('hidden'));
+    function showScreen(id) {
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('list-screen').classList.add('hidden');
         document.getElementById(id).classList.remove('hidden');
     }
 
     document.getElementById('login-btn').onclick = () => signInWithPopup(auth, provider);
     document.getElementById('logout-btn').onclick = () => signOut(auth);
 
-    // --- User Management ---
-    function initUserObserver() {
+    function loadUsers() {
         onSnapshot(collection(db, "users"), (snap) => {
-            allUsers = snap.docs.map(d => d.data()).filter(u => u.uid !== me.uid);
-            renderUsers(allUsers);
+            usersData = snap.docs.map(d => d.data()).filter(u => u.uid !== userMe.uid);
+            renderUserList(usersData);
         });
     }
 
-    function renderUsers(users) {
-        const container = document.getElementById('users-list');
-        container.innerHTML = users.map(u => `
-            <div onclick="openChat('${u.uid}', '${u.name}', '${u.photo}')" class="flex items-center gap-4 p-4 active:bg-gray-100 cursor-pointer transition-colors">
-                <div class="relative">
-                    <img src="${u.photo}" class="w-14 h-14 rounded-full shadow-sm">
-                    <div class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></div>
-                </div>
+    function renderUserList(users) {
+        const list = document.getElementById('users-list');
+        list.innerHTML = users.map(u => `
+            <div onclick="startChat('${u.uid}', '${u.name}', '${u.photo}')" class="flex items-center gap-4 p-4 hover:bg-gray-50 cursor-pointer active:bg-gray-100 transition-all">
+                <img src="${u.photo}" class="w-14 h-14 rounded-full border shadow-sm">
                 <div class="flex-1">
-                    <div class="flex justify-between items-center mb-0.5">
-                        <h4 class="font-bold text-gray-800">${u.name}</h4>
-                    </div>
-                    <p class="text-xs text-gray-400 line-clamp-1">Tap to chat professionally</p>
+                    <h4 class="font-bold text-gray-800">${u.name}</h4>
+                    <p class="text-xs text-gray-400">Tap to start secure chat</p>
                 </div>
             </div>
         `).join('');
     }
 
-    document.getElementById('search-input').oninput = (e) => {
-        const term = e.target.value.toLowerCase();
-        renderUsers(allUsers.filter(u => u.name.toLowerCase().includes(term)));
+    document.getElementById('search-box').oninput = (e) => {
+        const t = e.target.value.toLowerCase();
+        renderUserList(usersData.filter(u => u.name.toLowerCase().includes(t)));
     };
 
-    // --- Chat Logic ---
-    window.openChat = (targetId, name, photo) => {
-        activeChatId = me.uid < targetId ? `${me.uid}_${targetId}` : `${targetId}_${me.uid}`;
-        document.getElementById('chat-target-name').innerText = name;
-        document.getElementById('chat-target-img').src = photo;
+    window.startChat = (targetId, name, photo) => {
+        activeChatId = userMe.uid < targetId ? `${userMe.uid}_${targetId}` : `${targetId}_${userMe.uid}`;
+        document.getElementById('target-name').innerText = name;
+        document.getElementById('target-pic').src = photo;
         document.getElementById('chat-screen').classList.remove('hidden');
         
-        const q = query(collection(db, `chats/${activeChatId}/messages`), orderBy("ts", "asc"));
+        const q = query(collection(db, `chats/${activeChatId}/messages`), orderBy("time", "asc"));
         onSnapshot(q, (snap) => {
-            const flow = document.getElementById('msg-flow');
+            const flow = document.getElementById('chat-flow');
             flow.innerHTML = '';
             snap.forEach(d => {
                 const m = d.data();
-                const isMe = m.sid === me.uid;
+                const isMe = m.sid === userMe.uid;
                 const div = document.createElement('div');
-                div.className = `flex ${isMe ? 'justify-end' : 'justify-start'}`;
+                div.className = `flex ${isMe ? 'justify-end' : 'justify-start'} message-in`;
                 div.innerHTML = `
-                    <div class="${isMe ? 'bg-[#dcf8c6] text-gray-800 rounded-l-lg rounded-tr-lg' : 'bg-white text-gray-800 rounded-r-lg rounded-tl-lg'} p-2.5 px-4 shadow-sm max-w-[80%] text-sm relative">
-                        ${m.txt}
+                    <div class="${isMe ? 'bg-green-600 text-white rounded-l-xl rounded-tr-xl' : 'bg-white text-gray-800 rounded-r-xl rounded-tl-xl'} p-3 shadow-md max-w-[85%] relative">
+                        <p class="text-sm pb-3">${m.txt}</p>
+                        <span class="absolute bottom-1 right-2 text-[9px] opacity-70">${m.stamp || ''}</span>
                     </div>
                 `;
                 flow.appendChild(div);
@@ -181,20 +166,30 @@
         });
     };
 
-    document.getElementById('close-chat').onclick = () => document.getElementById('chat-screen').classList.add('hidden');
+    document.getElementById('back-to-list').onclick = () => document.getElementById('chat-screen').classList.add('hidden');
 
-    document.getElementById('send-form').onsubmit = async (e) => {
+    document.getElementById('chat-form').onsubmit = async (e) => {
         e.preventDefault();
-        const input = document.getElementById('msg-input');
-        const val = input.value.trim();
-        if(!val || !activeChatId) return;
+        const input = document.getElementById('chat-input');
+        const text = input.value.trim();
+        if(!text || !activeChatId) return;
 
         input.value = '';
-        await addDoc(collection(db, `chats/${activeChatId}/messages`), {
-            txt: val,
-            sid: me.uid,
-            ts: serverTimestamp()
-        });
+        const now = new Date();
+        const timeString = now.getHours().toString().padStart(2, '0') + ":" + 
+                           now.getMinutes().toString().padStart(2, '0') + ":" + 
+                           now.getSeconds().toString().padStart(2, '0');
+
+        try {
+            await addDoc(collection(db, `chats/${activeChatId}/messages`), {
+                txt: text,
+                sid: userMe.uid,
+                time: serverTimestamp(),
+                stamp: timeString // এই লাইনটি সেকেন্ডসহ সময় দেখাবে
+            });
+        } catch (err) {
+            alert("Error: " + err.message);
+        }
     };
 </script>
 </body>
